@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GridWise — Energy Optimizer</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">⚡</div>
+      <div>
+        <div class="title">GridWise</div>
+        <div class="subtitle">LLM-aware energy optimizer — live demo</div>
+      </div>
+    </div>
+    <div class="status" id="status">
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text">checking…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: input panel -->
+    <section class="panel" id="panel-input">
+      <h2>Scenario</h2>
+
+      <label>Load sample
+        <select id="sample-picker"><option value="">— custom —</option></select>
+      </label>
+
+      <label>Scenario ID
+        <input id="f-scenario_id" type="text" value="SAMPLE-01" />
+      </label>
+
+      <details open>
+        <summary>Battery</summary>
+        <div class="grid-2">
+          <label>Capacity (kWh)<input id="b-capacity" type="number" step="0.1" min="0" /></label>
+          <label>Initial (kWh)<input id="b-initial" type="number" step="0.1" min="0" /></label>
+          <label>Minimum (kWh)<input id="b-min" type="number" step="0.1" min="0" /></label>
+          <label>Max charge /h<input id="b-mch" type="number" step="0.1" min="0" /></label>
+          <label>Max discharge /h<input id="b-mdis" type="number" step="0.1" min="0" /></label>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Hourly profile (24 rows)</summary>
+        <div class="hours-wrap">
+          <table class="hours" id="hours-table">
+            <thead>
+              <tr><th>h</th><th>demand</th><th>solar</th><th>tariff</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+
+      <label>Operator notes (one per line)
+        <textarea id="f-notes" rows="4" placeholder="e.g. Cap grid at 100 kWh from 6 PM to 9 PM"></textarea>
+      </label>
+
+      <div class="actions">
+        <button id="btn-optimize" class="primary">Optimize</button>
+        <button id="btn-load" class="secondary" type="button">Load sample</button>
+        <button id="btn-clear" class="ghost" type="button">Clear notes</button>
+      </div>
+      <p class="hint" id="form-hint">Posts to <code>/optimize-energy</code> on the running server.</p>
+    </section>
+
+    <!-- RIGHT: results panel -->
+    <section class="panel" id="panel-results">
+      <h2>Results</h2>
+
+      <div class="cards" id="cards">
+        <div class="card"><div class="card-label">Total grid</div><div class="card-value" id="kpi-grid">—</div><div class="card-unit">kWh</div></div>
+        <div class="card"><div class="card-label">Total cost</div><div class="card-value" id="kpi-cost">—</div><div class="card-unit">BDT</div></div>
+        <div class="card"><div class="card-label">Peak grid</div><div class="card-value" id="kpi-peak">—</div><div class="card-unit">kWh / h</div></div>
+        <div class="card"><div class="card-label">Directives</div><div class="card-value" id="kpi-directives">—</div><div class="card-unit">applied</div></div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="planChart" height="220"></canvas>
+        <div class="legend">
+          <span><i class="sw grid"></i>Grid kWh</span>
+          <span><i class="sw solar"></i>Solar used</span>
+          <span><i class="sw batt"></i>Battery action</span>
+          <span><i class="sw soc"></i>Battery SOC</span>
+        </div>
+      </div>
+
+      <details open>
+        <summary>Plan summary</summary>
+        <p id="plan-summary" class="summary">Run the optimizer to see the human-readable summary.</p>
+      </details>
+
+      <details open>
+        <summary>Directive interpretation</summary>
+        <div id="directives"></div>
+      </details>
+
+      <details>
+        <summary>Hourly plan table</summary>
+        <div class="hours-wrap">
+          <table class="plan" id="plan-table">
+            <thead>
+              <tr><th>hour</th><th>grid</th><th>solar</th><th>action</th><th>battery kWh</th><th>SOC after</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot">
+    GridWise · API <a href="/docs" target="_blank" rel="noreferrer">/docs</a> ·
+    <a href="https://github.com/" target="_blank" rel="noreferrer">repo</a>
+  </footer>
+</body>
+</html>
